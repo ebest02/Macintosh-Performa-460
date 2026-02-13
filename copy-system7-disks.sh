@@ -142,6 +142,64 @@ menu_action_disquette() {
     echo "$choix"
 }
 
+menu_erreur_espace() {
+    local choix
+    while true; do
+        echo -e "${CYAN}─── Périphérique plein - Que faire ? ───${NC}"
+        echo "  1) Débrancher le lecteur USB, insérer une disquette vierge, rebrancher"
+        echo "  2) Lister les périphériques (lsblk)"
+        echo "  3) Changer le périphérique cible"
+        echo "  r) Réessayer la copie"
+        echo "  s) Sauter cette disquette"
+        echo "  a) Annuler et quitter"
+        echo ""
+        read -r -p "$(echo -e "${CYAN}Votre choix${NC} (1/2/3/r/s/a): ")" choix
+        
+        case "${choix,,}" in
+            1)
+                echo ""
+                echo -e "${YELLOW}Étapes recommandées:${NC}"
+                echo "  1. Débranchez le lecteur USB (ou retirez la disquette du lecteur)"
+                echo "  2. Insérez une disquette vierge ou formatée"
+                echo "  3. Rebranchez le lecteur / remettez la disquette"
+                echo "  4. Choisissez 'r' pour réessayer"
+                echo ""
+                read -r -p "Appuyez sur Entrée pour continuer..."
+                ;;
+            2)
+                echo ""
+                lsblk
+                echo ""
+                read -r -p "Appuyez sur Entrée pour continuer..."
+                ;;
+            3)
+                echo ""
+                choisir_peripherique
+                read -r -p "Appuyez sur Entrée pour continuer..."
+                ;;
+            r)
+                echo "Nouvelle tentative..."
+                choix="r"
+                break
+                ;;
+            s)
+                echo "Disquette sautée."
+                choix="s"
+                break
+                ;;
+            a)
+                echo "Opération annulée."
+                choix="a"
+                break
+                ;;
+            *)
+                echo -e "${RED}Choix non reconnu${NC}"
+                ;;
+        esac
+    done
+    echo -n "$choix"
+}
+
 #─────────────────────────────────────────────────────────────────────────────
 # COPIE D'UNE DISQUETTE
 #─────────────────────────────────────────────────────────────────────────────
