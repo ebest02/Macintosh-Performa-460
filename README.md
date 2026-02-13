@@ -1,1004 +1,631 @@
-================================================================================
-                                RÉINSTALLER UN MACINTOSH PERFORMA 460 AVEC LINUX
-================================================================================
-
-Date: Février 2026
-Système cible: Macintosh Performa 460
-OS hôte: Linux (Debian/Ubuntu/Kaisen Linux)
-
-================================================================================
-TABLE DES MATIÈRES
-================================================================================
+# README.md - Installation System 7.5.3 sur Macintosh Performa 460
 
-1. INFORMATIONS SUR LE PERFORMA 460
-2. MATÉRIEL ET LOGICIELS NÉCESSAIRES
-3. PRÉPARATION DU SYSTÈME LINUX
-4. TÉLÉCHARGEMENT DES IMAGES SYSTÈME
-5. EXTRACTION DES FICHIERS .part
-6. CRÉATION DES DISQUETTES D'INSTALLATION
-7. PRÉPARATION DU MACINTOSH
-8. INSTALLATION DU SYSTÈME
-9. DÉPANNAGE
-10. RESSOURCES ET LIENS
+> **Guide complet pour restaurer votre Macintosh Performa 460 avec System 7.5.3**  
+> Utilisation de Linux pour créer les supports d'installation
 
-================================================================================
-1. INFORMATIONS SUR LE PERFORMA 460
-================================================================================
+---
 
-SPÉCIFICATIONS TECHNIQUES:
-- Processeur: Motorola 68030 à 33 MHz
-- RAM: 4 Mo (extensible à 36 Mo)
-- Disque dur: 80 Mo SCSI
-- Lecteur: SuperDrive 1.44 Mo (2HD, double face)
-- Ports: SCSI, ADB, série, audio
-- Date de sortie: Octobre 1993
-- Date d'arrêt: Février 1994
-- Équivalent éducation: LC III+
+## 📋 Table des Matières
 
-SYSTÈME D'ORIGINE:
-- System 7.1P3 (oct-déc 1993)
-- System 7.1P5 (après déc 1993)
-- System Enabler 308 v1.0 REQUIS pour System 7.1
+1. [À Propos](#-à-propos)
+2. [Prérequis](#-prérequis)
+3. [Choix de la Méthode](#-choix-de-la-méthode)
+4. [Installation Rapide](#-installation-rapide)
+5. [Utilisation du Script](#-utilisation-du-script)
+6. [Structure du Projet](#-structure-du-projet)
+7. [Dépannage](#-dépannage)
+8. [Ressources](#-ressources)
+9. [Contribution](#-contribution)
 
-COMPATIBILITÉ SYSTÈME:
-✓ System 7.0.1 à 7.1 (avec System Enabler 308)
-✓ System 7.5 à 7.6.1 (PAS de System Enabler requis)
-✓ Mac OS 8.0 à 8.1
-✗ Mac OS 8.5+ (non supporté)
+---
 
+## 📖 À Propos
 
+Ce projet vous guide dans la réinstallation complète d'un **Macintosh Performa 460** (1993) en utilisant un système Linux moderne. Deux méthodes sont disponibles :
 
-================================================================================
-2. MATÉRIEL ET LOGICIELS NÉCESSAIRES
-================================================================================
+- **🥞 Méthode Disquettes** : Installation classique avec 19 disquettes 1.44 Mo
+- **💿 Méthode CD-ROM** : Installation moderne via CD-ROM SCSI
 
-MATÉRIEL:
-□ 19-20 disquettes 2HD (1.44 Mo) NEUVES ou en excellent état
-□ Lecteur de disquettes USB ou interne compatible Linux
-□ Macintosh Performa 460 fonctionnel
-□ Clavier et souris ADB
-□ Moniteur compatible (VGA ou Apple)
-□ Câble d'alimentation
+### Caractéristiques du Performa 460
 
-LOGICIELS LINUX:
-□ hfsutils et hfsprogs (pour formater HFS)
-□ unar ou HFSExplorer (pour extraire archives Mac)
-□ dd (normalement préinstallé)
-□ Java 11+ (pour HFSExplorer)
+| Composant | Spécification |
+|-----------|---------------|
+| Processeur | Motorola 68030 @ 33 MHz |
+| RAM | 4 Mo (extensible à 36 Mo) |
+| Disque dur | 80 Mo SCSI |
+| Lecteur | SuperDrive 1.44 Mo |
+| Système | System 7.1P3/P5 (origine) |
+| Compatible | System 7.5.3 à Mac OS 8.1 |
 
-FICHIERS À TÉLÉCHARGER:
-□ System 7.5.3 (19 images de disquettes)
-□ Disk Tools / Utilities (disquette de boot)
-□ (Optionnel) SuperBooter75 (utilitaires)
-□ (Optionnel) System Enabler 308 (si System 7.1)
+---
 
+## ✅ Prérequis
 
+### Matériel Requis
 
-================================================================================
-3. PRÉPARATION DU SYSTÈME LINUX
-================================================================================
+#### Pour la Méthode Disquettes
 
-ÉTAPE 3.1 : Installation des outils nécessaires
-------------------------------------------------
+- [ ] **Linux** (Debian/Ubuntu/Kaisen Linux)
+- [ ] **19-20 disquettes 2HD** (1.44 Mo) neuves ou en excellent état
+- [ ] **Lecteur de disquettes** USB externe OU interne
+- [ ] **Macintosh Performa 460** fonctionnel
+- [ ] Clavier et souris ADB
+- [ ] Moniteur compatible
 
-# Mise à jour du système
-sudo apt-get update
+#### Pour la Méthode CD-ROM
 
-# Installation des outils HFS
-sudo apt-get install hfsutils hfsprogs
+- [ ] **Linux** (Debian/Ubuntu/Kaisen Linux)
+- [ ] **1 CD-ROM vierge** (700 Mo)
+- [ ] **Graveur CD** (USB ou interne)
+- [ ] **1 disquette** pour booter (Disk Tools 1)
+- [ ] **Lecteur CD-ROM SCSI externe** pour Mac
+- [ ] **Câble SCSI** + terminaison
+- [ ] **Macintosh Performa 460** fonctionnel
+- [ ] Clavier, souris ADB, moniteur
 
-# Installation de unar (pour extraire archives Mac)
-sudo apt-get install unar
+### Logiciels Linux
 
-# Installation de Java (pour HFSExplorer si nécessaire)
-sudo apt-get install openjdk-11-jre
+Les outils suivants seront installés automatiquement par le script :
 
-# Vérification du module floppy
-lsmod | grep floppy
+- `hfsutils` et `hfsprogs` - Formatage HFS (Macintosh)
+- `unar` - Extraction d'archives Mac
+- `genisoimage` et `wodim` - Création et gravure de CD
+- `dd` - Copie d'images disque
 
-# Si absent, charger le module
-sudo modprobe floppy
+---
 
-# Vérifier les permissions du lecteur
-ls -l /dev/fd0
+## 🎯 Choix de la Méthode
 
-# Si nécessaire, ajuster les permissions
-sudo chmod 666 /dev/fd0
+### Comparaison des Méthodes
 
+| Critère | 🥞 Disquettes | 💿 CD-ROM |
+|---------|---------------|-----------|
+| **Temps installation** | 45-60 minutes | 20-30 minutes |
+| **Nombre de supports** | 19 disquettes | 1 CD + 1 disquette |
+| **Changement média** | Oui (18 fois) | Non |
+| **Coût matériel** | ~20€ (lecteur USB) | ~50-100€ (CD-ROM SCSI) |
+| **Fiabilité** | Moyenne | Élevée |
+| **Réutilisabilité** | Faible | Excellente |
+| **Complexité** | Simple | Moyenne (config SCSI) |
+| **Universalité** | Tous les Mac | Nécessite port SCSI |
 
+### Quelle Méthode Choisir ?
 
-ÉTAPE 3.2 : Création du dossier de travail
--------------------------------------------
+**Choisissez les DISQUETTES si :**
+- ✅ Vous débutez avec le rétro-computing
+- ✅ Vous n'avez pas de matériel SCSI
+- ✅ Vous voulez l'expérience authentique années 90
+- ✅ Budget limité
 
-mkdir -p ~/performa460/system753
-mkdir -p ~/performa460/images_extracted
-cd ~/performa460/system753
+**Choisissez le CD-ROM si :**
+- ✅ Vous avez un lecteur CD-ROM SCSI
+- ✅ Vous voulez réinstaller plusieurs fois
+- ✅ Vous préférez la rapidité
+- ✅ Vous êtes à l'aise avec la config SCSI
 
+---
 
+## 🚀 Installation Rapide
 
-ÉTAPE 3.3 : Test du lecteur de disquettes
-------------------------------------------
+### Étape 1 : Cloner le Projet
 
-# Insérer une disquette test
-# Vérifier la détection
-dmesg | tail -20
+```bash
+git clone https://github.com/votre-repo/performa460-installer.git
+cd performa460-installer
+```
 
-# Devrait afficher quelque chose comme:
-# floppy0: detected floppy disk change
+Ou téléchargez et extrayez l'archive ZIP.
 
-# Vérifier avec lsblk
-lsblk | grep fd0
+### Étape 2 : Lancer le Script Interactif
 
+```bash
+chmod +x performa460-installer.sh
+./performa460-installer.sh
+```
 
+Le script vous guidera pas à pas à travers :
+1. Vérification des dépendances
+2. Téléchargement de System 7.5.3
+3. Création des supports (disquettes ou CD)
+4. Instructions d'installation sur le Mac
 
-================================================================================
-4. TÉLÉCHARGEMENT DES IMAGES SYSTÈME
-================================================================================
+### Étape 3 : Suivre les Instructions
 
-OPTION A : Macintosh Garden (Archive complète)
------------------------------------------------
+Le script affichera des instructions claires pour :
+- Identifier votre lecteur de disquettes ou graveur
+- Créer les supports d'installation
+- Installer System 7.5.3 sur votre Performa 460
 
-URL: https://macintoshgarden.org/apps/system-7-floppy-sets
-Fichier: "7_5_3.sit" (86.12 MB)
+---
 
-# Télécharger manuellement via navigateur
-# ou avec wget (si lien direct disponible)
+## 🛠️ Utilisation du Script
 
-cd ~/performa460/system753
-# Placer le fichier 7_5_3.sit ici
+### Menu Principal
 
+Au lancement, le script propose :
 
+```
+┌────────────────────────────────────────────────────────┐
+│  INSTALLATION SYSTEM 7.5.3 - MACINTOSH PERFORMA 460    │
+└────────────────────────────────────────────────────────┘
 
-OPTION B : Internet Archive (Images individuelles)
----------------------------------------------------
+Choisissez la méthode d'installation :
 
-URL: https://archive.org/details/system7.5.3d
+  1) Installation par DISQUETTES (19 disquettes requises)
+  2) Installation par CD-ROM SCSI (1 CD + 1 disquette boot)
+  3) Télécharger les images System 7.5.3
+  4) Vérifier les images téléchargées
+  5) Aide et informations
+  6) Quitter
+```
 
-# Méthode 1: Téléchargement manuel via navigateur
+### Option 1 : Installation par Disquettes
 
-# Méthode 2: wget pour télécharger toutes les images
-cd ~/performa460/images_extracted
+Le script vous guidera pour :
 
-wget "https://archive.org/download/system7.5.3d/Install 1.image"
-wget "https://archive.org/download/system7.5.3d/Install 2.image"
-wget "https://archive.org/download/system7.5.3d/Install 3.image"
-wget "https://archive.org/download/system7.5.3d/Install 4.image"
-wget "https://archive.org/download/system7.5.3d/Install 5.image"
-wget "https://archive.org/download/system7.5.3d/Install 6.image"
-wget "https://archive.org/download/system7.5.3d/Install 7.image"
-wget "https://archive.org/download/system7.5.3d/Install 8.image"
-wget "https://archive.org/download/system7.5.3d/Install 9.image"
-wget "https://archive.org/download/system7.5.3d/Install 10.image"
-wget "https://archive.org/download/system7.5.3d/Install 11.image"
-wget "https://archive.org/download/system7.5.3d/Install 12.image"
-wget "https://archive.org/download/system7.5.3d/Install 13.image"
-wget "https://archive.org/download/system7.5.3d/Install 14.image"
-wget "https://archive.org/download/system7.5.3d/Install 15.image"
-wget "https://archive.org/download/system7.5.3d/Install 16.image"
-wget "https://archive.org/download/system7.5.3d/Install 17.image"
-wget "https://archive.org/download/system7.5.3d/Install 18.image"
-wget "https://archive.org/download/system7.5.3d/Install 19.image"
-wget "https://archive.org/download/system7.5.3d/Disk Tools.image"
+1. **Identifier le lecteur**
+   - Détection automatique du lecteur interne (`/dev/fd0`)
+   - Configuration manuelle pour lecteur USB (`/dev/sdb`)
 
-# Méthode 3: Téléchargement automatique complet
-wget -r -np -nd -A "*.image" "https://archive.org/download/system7.5.3d/"
+2. **Vérifier les images**
+   - Contrôle de la présence des 16-19 fichiers .image
+   - Proposition de téléchargement si manquant
 
-# Méthode 4: Avec Internet Archive CLI
-pip3 install internetarchive
-ia download system7.5.3d
+3. **Créer les disquettes**
+   - Copie automatique sur chaque disquette
+   - Vérification du format HFS
+   - Instructions d'étiquetage
 
+4. **Instructions finales**
+   - Ordre d'utilisation des disquettes
+   - Procédure d'installation sur le Mac
 
+### Option 2 : Installation par CD-ROM
 
-OPTION C : Téléchargement SuperBooter75 (Utilitaires)
-------------------------------------------------------
+Le script vous guidera pour :
 
-URL: https://vintageapple.org/gamba2/superbooter75.html
+1. **Vérifier les images**
+   - Contrôle des fichiers nécessaires
+   - Téléchargement automatique si besoin
 
-cd ~/performa460
-wget https://vintageapple.org/gamba2/files/SuperBooter75.dsk
+2. **Créer l'image ISO**
+   - Construction d'une ISO hybride HFS + ISO9660
+   - Compatible avec les Macintosh
 
+3. **Graver le CD**
+   - Détection automatique du graveur
+   - Gravure avec vérification
 
+4. **Créer la disquette boot**
+   - Une seule disquette "Disk Tools 1" nécessaire
 
-================================================================================
-5. EXTRACTION DES FICHIERS .part
-================================================================================
+5. **Instructions SCSI**
+   - Configuration de la chaîne SCSI
+   - Procédure d'installation
 
-Si vous avez des fichiers .part et .part.rsrc (archives StuffIt segmentées)
+### Option 3 : Télécharger les Images
 
-PROBLÈME:
-- 19 fichiers .part (1.2 Mo chacun)
-- 19 fichiers .part.rsrc (743 octets chacun)
+Sources disponibles :
 
-Ces fichiers doivent être EXTRAITS pour obtenir les vraies images .image
+- **Internet Archive** (recommandé) - Images directes
+- **Macintosh Garden** - Archive .sit à extraire
+- **Images locales** - Utiliser des fichiers déjà téléchargés
 
+### Option 4 : Vérifier les Images
 
+Contrôle automatique :
+- Nombre de fichiers présents
+- Taille de chaque fichier (doit être 1 474 560 octets)
+- Intégrité des images
 
-MÉTHODE 1 : Avec unar (Simple)
--------------------------------
+### Option 5 : Aide
 
-cd ~/performa460/system753
+Affiche :
+- Comparaison détaillée des méthodes
+- Matériel SCSI recommandé
+- Dépannage rapide
+- Liens vers ressources
 
-# Tenter l'extraction du premier fichier
-unar "Install 1.part"
+---
 
-# Si ça fonctionne, extraire tous les fichiers
-for file in *.part; do
-    echo ""
-    echo "Extraction de $file..."
-    echo ""
-    unar "$file"
-done
+## 📁 Structure du Projet
 
-# Déplacer les images extraites
-mv *.image ../images_extracted/
-mv *.img ../images_extracted/
-mv *.dsk ../images_extracted/
+```
+performa460-installer/
+│
+├── README.md                          # Ce fichier
+├── LICENSE                            # Licence MIT
+├── performa460-installer.sh           # Script principal interactif
+├── copy-system7-disks.sh              # Script de copie disquettes (standalone)
+│
+├── docs/                              # Documentation complète
+│   ├── guide-complet.md               # Guide détaillé avec commandes
+│   ├── guide-cd-rom.md                # Guide spécifique CD-ROM bootable
+│   └── troubleshooting.md             # Dépannage approfondi
+│
+├── images_extracted/                  # Images System 7.5.3 (à créer)
+│   ├── Install Disk 1.image
+│   ├── Install Disk 2.image
+│   ├── ...
+│   ├── Install Disk 16.image
+│   ├── Disk Tools 1.image
+│   ├── Disk Tools 2.image
+│   └── Before You Install.image
+│
+└── cdrom_content/                     # Contenu CD (généré par script)
+    └── System Software/
+        └── [fichiers .image]
+```
 
+---
 
+## 🔧 Dépannage
 
-MÉTHODE 2 : Avec HFSExplorer (Si unar échoue)
-----------------------------------------------
+### Problèmes Courants - Disquettes
 
-# Télécharger HFSExplorer
-cd ~/Downloads
-wget https://sourceforge.net/projects/catacombae/files/HFSExplorer/0.23.1/hfsexplorer-0_23_1-bin.zip
+#### Disquette non détectée
 
-# Extraire
-unzip hfsexplorer-0_23_1-bin.zip
-cd hfsexplorer-0_23_1
+**Symptômes :** Le lecteur n'est pas reconnu sous Linux
 
-# Rendre exécutable
-chmod +x bin/hfsexplorer
+**Solutions :**
+1. Vérifier que le module est chargé : `lsmod | grep floppy`
+2. Charger le module si absent : `sudo modprobe floppy`
+3. Pour lecteur USB : vérifier avec `lsblk`
 
-# Lancer HFSExplorer
-./bin/hfsexplorer
+#### "Device busy"
 
-DANS HFSEXPLORER (Interface graphique):
-1. File → Load file system from file
-2. Naviguer vers ~/performa460/system753
-3. Sélectionner "Install 1.part"
-4. Clic droit sur le contenu → Extract
-5. Choisir ~/performa460/images_extracted comme destination
-6. Répéter pour tous les fichiers .part
+**Symptômes :** Impossible de copier sur la disquette
 
+**Solutions :**
+1. Démonter la disquette : `sudo umount /dev/fd0`
+2. Vérifier qu'aucun programme n'utilise le lecteur
+3. Redémarrer et réessayer
 
+#### Erreur de lecture sur Mac
 
-MÉTHODE 3 : Avec macunpack (Alternative)
------------------------------------------
+**Symptômes :** "This disk is unreadable by this Macintosh"
 
-# Installer macutils
-sudo apt-get install macutils
-
-cd ~/performa460/system753
-
-# Essayer de décoder
-for file in *.part; do
-    macunpack "$file"
-done
-
-
-
-VÉRIFICATION DES FICHIERS EXTRAITS:
------------------------------------
-
-cd ~/performa460/images_extracted
-
-# Lister les fichiers obtenus
-ls -lh
-
-# Vérifier la taille (doivent faire 1 474 560 octets)
-stat -c "%n: %s bytes" *.image
-
-# Vérifier le type de fichier
-file "Install 1.image"
-# Devrait afficher: "Macintosh HFS data" ou "DOS/MBR boot sector"
-
-# Compter les fichiers
-ls *.image | wc -l
-# Devrait afficher: 19 (ou 20 avec Disk Tools)
-
-
-
-RÉSULTAT ATTENDU:
------------------
-Install 1.image 1 474 560 octets
-Install 2.image 1 474 560 octets
-Install 3.image 1 474 560 octets
-...
-Install 19.image 1 474 560 octets
-Disk Tools.image 1 474 560 octets (optionnel)
-
-
-
-================================================================================
-6. CRÉATION DES DISQUETTES D'INSTALLATION
-================================================================================
-
-PRÉPARATION DES DISQUETTES:
----------------------------
-
-Vous aurez besoin de 19 disquettes 2HD neuves ou effacées.
-
-IMPORTANT:
-- Utiliser des disquettes 2HD (1.44 Mo, haute densité)
-- Vérifier qu'elles sont en bon état
-- Les étiqueter AVANT de les utiliser
-
-
-
-ÉTAPE 6.1 : Formater une disquette en HFS (Optionnel)
-------------------------------------------------------
-
-Note: dd écrase tout, donc le formatage préalable n'est pas obligatoire,
-mais peut être utile pour tester la disquette.
-
-# Insérer une disquette
-# Démonter si montée
-sudo umount /dev/fd0 2>/dev/null
-
-# Formater en HFS (Macintosh)
-sudo hformat -f -l "Install1" /dev/fd0
-
-# Vérifier
-sudo file -s /dev/fd0
-# Devrait afficher: "Macintosh HFS data"
-
-
-
-ÉTAPE 6.2 : Copier les images sur les disquettes (MÉTHODE MANUELLE)
---------------------------------------------------------------------
-
-cd ~/performa460/images_extracted
-
-Pour chaque disquette:
-
-1. INSÉRER la disquette vierge dans le lecteur
-
-2. DÉMONTER si nécessaire:
-   sudo umount /dev/fd0 2>/dev/null
-
-3. COPIER l'image (exemple avec Install 1):
-   sudo dd if="Install 1.image" of=/dev/fd0 bs=1440k status=progress
-
-4. SYNCHRONISER (force l'écriture):
-   sudo sync
-
-5. ÉJECTER proprement:
-   sudo eject /dev/fd0
-
-6. ÉTIQUETER la disquette: "Install 1" ou "7.5.3 - Disk 1"
-
-7. RÉPÉTER pour les 19 disquettes
-
-
-
-EXEMPLE COMPLET POUR UNE DISQUETTE:
------------------------------------
-
-# Disquette Install 1
-echo "Insérez la disquette Install 1 et appuyez sur Entrée..."
-read
-sudo umount /dev/fd0 2>/dev/null
-sudo dd if="Install 1.image" of=/dev/fd0 bs=1440k status=progress
-sudo sync
-echo "Disquette Install 1 terminée!"
-sudo eject /dev/fd0
-
-
-
-ÉTAPE 6.3 : Script automatisé pour toutes les disquettes
----------------------------------------------------------
-
-Créer un fichier: ~/performa460/copy_all_disks.sh
-
-#!/bin/bash
-# Script de copie automatique de toutes les disquettes
-
-IMAGES_DIR=~/performa460/images_extracted
-
-cd "$IMAGES_DIR"
-
-for i in {1..19}; do
-    echo ""
-    echo "Préparation de Install Disk $i"
-    echo ""
-    echo "Insérez la disquette $i et appuyez sur Entrée..."
-    read
-
-    # Chercher le fichier image correspondant
-    IMAGE=$(find . -iname "*install*$i*.image" -o -iname "*install*$i*.img" | head -1)
-
-    if [ -z "$IMAGE" ]; then
-        echo "ERREUR: Image $i non trouvée!"
-        echo "Recherche de: *install*$i*.image ou *install*$i*.img"
-        continue
-    fi
-
-    echo "Fichier trouvé: $IMAGE"
-    echo "Copie vers /dev/fd0..."
-
-    # Démonter
-    sudo umount /dev/fd0 2>/dev/null
-
-    # Copier avec dd
-    sudo dd if="$IMAGE" of=/dev/fd0 bs=1440k status=progress
-
-    if [ $? -ne 0 ]; then
-        echo "ERREUR lors de la copie!"
-        continue
-    fi
-
-    # Synchroniser
-    sudo sync
-
-    echo "✓ Disquette $i terminée avec succès!"
-    echo ""
-
-    # Optionnel: éjecter
-    # sudo eject /dev/fd0
-done
-
-echo ""
-echo "✓ Toutes les disquettes sont prêtes!"
-echo ""
-
-# FIN DU SCRIPT
-
-Rendre le script exécutable:
-chmod +x ~/performa460/copy_all_disks.sh
-
-Lancer le script:
-~/performa460/copy_all_disks.sh
-
-
-
-ÉTAPE 6.4 : Disquette Disk Tools (Disquette de boot)
------------------------------------------------------
-
-La disquette "Disk Tools" est importante car elle permet de:
-- Booter le Mac sans disque dur
-- Formater le disque dur
-- Réparer les erreurs
-- Lancer l'installation
-
-# Copier Disk Tools
-sudo umount /dev/fd0 2>/dev/null
-sudo dd if="Disk Tools.image" of=/dev/fd0 bs=1440k status=progress
-sudo sync
-sudo eject /dev/fd0
-
-# Étiqueter: "Disk Tools" ou "7.5.3 - Boot"
-
-
-
-VÉRIFICATION D'UNE DISQUETTE CRÉÉE:
------------------------------------
-
-# Insérer la disquette créée
-# Vérifier le contenu sans la monter
-sudo file -s /dev/fd0
-
-# Devrait afficher:
-# /dev/fd0: Macintosh HFS data block size: 512, number of blocks: 2880
-
-# Pour voir le contenu (optionnel)
-sudo mkdir -p /mnt/floppy
-sudo mount -t hfs /dev/fd0 /mnt/floppy
-ls -la /mnt/floppy
-sudo umount /mnt/floppy
-
-
-
-LISTE DES DISQUETTES À CRÉER:
-------------------------------
-□ Install 1 (Disk Tools inclus généralement)
-□ Install 2
-□ Install 3
-□ Install 4
-□ Install 5
-□ Install 6
-□ Install 7
-□ Install 8
-□ Install 9
-□ Install 10
-□ Install 11
-□ Install 12
-□ Install 13
-□ Install 14
-□ Install 15
-□ Install 16
-□ Install 17
-□ Install 18
-□ Install 19
-□ Disk Tools (si séparé)
-
-
-
-================================================================================
-7. PRÉPARATION DU MACINTOSH
-================================================================================
-
-ÉTAPE 7.1 : Vérification matérielle
-------------------------------------
-
-□ Brancher l'alimentation
-□ Connecter le clavier ADB
-□ Connecter la souris ADB
-□ Connecter le moniteur
-□ Vérifier que le lecteur de disquette fonctionne
-
-
-
-ÉTAPE 7.2 : Test de démarrage
-------------------------------
-
-1. Allumer le Mac
-2. Écouter le "bong" de démarrage
-3. Observer l'écran:
-   - Si disque dur OK: Mac démarre normalement
-   - Si disque dur vide/défectueux: Icône disquette clignotante avec ?
-
-
-
-ÉTAPE 7.3 : Formatage du disque dur (si nécessaire)
-----------------------------------------------------
-
-Si le disque dur doit être reformaté:
-
-1. Insérer la disquette "Disk Tools" ou "SuperBooter75"
-2. Démarrer le Mac (il devrait booter depuis la disquette)
-3. Attendre que le bureau apparaisse
-4. Double-cliquer sur "HD SC Setup" ou équivalent
-5. Sélectionner le disque dur interne
-6. Cliquer "Initialize" (EFFACE TOUT!)
-7. Confirmer
-8. Attendre la fin du formatage
-9. Quitter HD SC Setup
-
-
-
-ÉTAPE 7.4 : Vérification du disque
------------------------------------
-
-Utiliser "Disk First Aid" sur la disquette Disk Tools:
-
-1. Double-cliquer sur "Disk First Aid"
-2. Sélectionner le disque dur
-3. Cliquer "Verify"
-4. Si erreurs: cliquer "Repair"
-5. Quitter
-
-
-
-================================================================================
-8. INSTALLATION DU SYSTÈME
-================================================================================
-
-ÉTAPE 8.1 : Démarrage de l'installation
-----------------------------------------
-
-1. INSÉRER la disquette "Install 1" (ou "Disk Tools" si séparé)
-2. REDÉMARRER le Mac
-3. ATTENDRE que le Mac démarre depuis la disquette
-   - Vous verrez l'icône de la disquette à l'écran
-   - Le bureau Mac devrait apparaître après 30-60 secondes
-
-
-
-ÉTAPE 8.2 : Lancer l'installeur
---------------------------------
-
-1. Sur le bureau, double-cliquer sur "Install" ou "Installer"
-2. Une fenêtre d'accueil apparaît
-3. Lire les informations
-4. Cliquer "Continue" ou "OK"
-
-
-
-ÉTAPE 8.3 : Configuration de l'installation
---------------------------------------------
-
-1. Sélectionner le disque de destination:
-   - Choisir le disque dur interne
-   - Cliquer "Select" ou double-cliquer
-
-2. Type d'installation:
-   - Choisir "Easy Install" (installation complète)
-   - Ou "Custom Install" pour personnaliser
-
-3. Cliquer "Install" ou "Start"
-
-
-
-ÉTAPE 8.4 : Insertion des disquettes (Processus)
--------------------------------------------------
-
-L'installeur vous demandera les disquettes dans l'ordre:
-
-Installation Disk 1 → OK
-"Please insert Install 2" → Insérer Install 2
-"Please insert Install 3" → Insérer Install 3
-...
-"Please insert Install 19" → Insérer Install 19
-
-IMPORTANT:
-- Attendre que la disquette soit éjectée automatiquement
-- Ne PAS retirer la disquette de force
-- Insérer la disquette suivante quand demandée
-- Si erreur de lecture: nettoyer la disquette et réessayer
-
-
-
-ÉTAPE 8.5 : Fin de l'installation
-----------------------------------
-
-1. Après Install 19, l'installation est terminée
-2. Message: "Installation successful" ou similaire
-3. Cliquer "Restart" ou "Quit"
-4. Le Mac redémarre automatiquement
-
-
-
-ÉTAPE 8.6 : Premier démarrage
-------------------------------
-
-1. Le Mac démarre depuis le disque dur
-2. Configuration initiale:
-   - Langue
-   - Clavier
-   - Date et heure
-   - Nom d'utilisateur (optionnel selon version)
-
-3. Le bureau Mac OS 7.5.3 apparaît!
-
-
-
-DURÉE TOTALE DE L'INSTALLATION:
---------------------------------
-Environ 30 à 60 minutes selon:
-- Vitesse du Mac
-- État des disquettes
-- Nombre d'erreurs de lecture
-
-
-
-================================================================================
-9. DÉPANNAGE
-================================================================================
-
-PROBLÈME 1 : "This disk is unreadable by this Macintosh"
----------------------------------------------------------
-
-CAUSE: Disquette mal formatée ou corrompue
-
-SOLUTION:
-1. Vérifier que la disquette a été créée correctement
-2. Recréer la disquette avec dd
+**Solutions :**
+1. Vérifier la taille de l'image (doit être exactement 1 474 560 octets)
+2. Recréer la disquette avec le script
 3. Essayer une autre disquette vierge
-4. Vérifier l'image source avec: file fichier.image
+4. Nettoyer la tête de lecture du Mac
 
+### Problèmes Courants - CD-ROM
 
+#### CD non détecté sur le Mac
 
-PROBLÈME 2 : "Please insert Install X" mais rien ne se passe
--------------------------------------------------------------
+**Symptômes :** Pas d'icône de CD sur le bureau
 
-CAUSE: Mauvaise disquette insérée ou erreur de lecture
+**Solutions :**
+1. Vérifier l'alimentation du lecteur CD-ROM SCSI
+2. Vérifier l'ID SCSI (doit être 3 ou 4)
+3. Vérifier la terminaison SCSI (terminateur actif recommandé)
+4. Tester le câble SCSI
+5. Redémarrer Mac + CD-ROM ensemble
 
-SOLUTION:
-1. Vérifier le numéro de la disquette demandée
-2. Éjecter et réinsérer la bonne disquette
-3. Nettoyer la tête de lecture du Mac avec une disquette de nettoyage
-4. Recréer la disquette défectueuse
+#### "This disk is unreadable"
 
+**Symptômes :** Le CD est détecté mais illisible
 
+**Solutions :**
+1. Vérifier que l'ISO a été créée avec l'option `-hfs`
+2. Regraver le CD à vitesse plus lente (4x au lieu de 8x)
+3. Utiliser un CD-R de meilleure qualité (Verbatim, TDK, Sony)
+4. Nettoyer le CD avec un chiffon doux
 
-PROBLÈME 3 : Le Mac ne démarre pas depuis la disquette
--------------------------------------------------------
+#### Configuration SCSI incorrecte
 
-CAUSE: Disquette non bootable ou lecteur défectueux
+**Symptômes :** Instabilité, périphériques qui disparaissent
 
-SOLUTION:
-1. Vérifier que vous utilisez "Disk Tools" ou "Install 1"
-2. Recréer la disquette de boot
-3. Essayer de démarrer en maintenant la touche "C"
-4. Tester avec une autre disquette bootable connue
+**Solutions :**
 
+Vérifier la chaîne SCSI complète :
 
+```
+[Disque dur interne ID:0] ←→ [Performa 460] ←→ [CD-ROM ID:3] + [Terminateur]
+```
 
-PROBLÈME 4 : Installation se bloque à X%
------------------------------------------
+Points de contrôle :
+- Disque dur interne sur ID 0
+- CD-ROM sur ID 3 ou 4 (jamais 0 ou 7)
+- Terminateur ACTIF sur le dernier périphérique
+- Pas de terminateur au milieu de la chaîne
+- Câbles SCSI de bonne qualité (< 3 mètres)
 
-CAUSE: Disquette défectueuse ou disque dur avec erreurs
+### Aide Supplémentaire
 
-SOLUTION:
-1. Attendre 2-3 minutes (parfois juste lent)
-2. Si vraiment bloqué: redémarrer et réessayer
-3. Vérifier le disque dur avec Disk First Aid
-4. Recréer la disquette qui pose problème
+Si vous rencontrez un problème non listé :
 
+1. Consultez le **guide complet** : `docs/guide-complet.md`
+2. Consultez le **guide dépannage** : `docs/troubleshooting.md`
+3. Visitez les forums communautaires (voir section Ressources)
+4. Ouvrez une issue sur GitHub
 
+---
 
-PROBLÈME 5 : "Not enough memory to run this application"
----------------------------------------------------------
+## 📚 Ressources
 
-CAUSE: RAM insuffisante (très rare avec 4 Mo pour System 7.5.3)
+### Téléchargement System 7.5.3
 
-SOLUTION:
-1. Redémarrer le Mac
-2. Ne pas lancer d'autres applications pendant l'installation
-3. Si récurrent: ajouter de la RAM
+- **Internet Archive** (recommandé)  
+  https://archive.org/details/system7.5.3d  
+  Images directes prêtes à l'emploi
 
+- **Macintosh Garden**  
+  https://macintoshgarden.org/apps/system-7-floppy-sets  
+  Archive complète + autres versions
 
+- **Macintosh Repository**  
+  https://www.macintoshrepository.org/598-mac-os-7-floppy-install-sets-system-7-x-
 
-PROBLÈME 6 : Erreur "dd: writing to '/dev/fd0': No space left on device"
-------------------------------------------------------------------------
+### Documentation Technique
 
-CAUSE: Image trop grande pour la disquette
+- **EveryMac - Performa 460**  
+  https://everymac.com/systems/apple/mac_performa/specs/mac_performa_460.html  
+  Spécifications complètes
 
-SOLUTION:
-1. Vérifier la taille de l'image:
-   ls -lh fichier.image
-   # Doit faire exactement 1 474 560 octets
+- **68kMLA - Forum Mac Vintage**  
+  https://68kmla.org  
+  Communauté d'experts Mac 68k
 
-2. Si trop grande: image corrompue ou mauvaise
-3. Télécharger à nouveau l'image
+- **Low End Mac**  
+  https://lowendmac.com  
+  Guides et astuces Mac vintage
 
+### Outils et Utilitaires
 
+- **HFSExplorer**  
+  https://sourceforge.net/projects/catacombae/  
+  Lecture de volumes HFS sous Linux/Windows
 
-PROBLÈME 7 : Le disque dur n'apparaît pas dans l'installeur
-------------------------------------------------------------
+- **System Enablers**  
+  https://macintoshgarden.org/apps/apple-system-enablers  
+  Collection complète d'enablers
 
-CAUSE: Disque non formaté ou non reconnu
+### Communautés
 
-SOLUTION:
-1. Booter depuis Disk Tools
-2. Lancer HD SC Setup
-3. Si le disque n'apparaît pas: problème matériel
-4. Vérifier les câbles SCSI
-5. Essayer avec un autre disque dur
+- **68k Macintosh Liberation Army**  
+  https://68kmla.org/bb/  
+  Forum très actif
 
+- **r/VintageApple** (Reddit)  
+  https://www.reddit.com/r/VintageApple/  
+  Communauté Reddit
 
+- **Vintage Computer Forum**  
+  https://forum.vcfed.org/  
+  Forum généraliste rétro-computing
 
-PROBLÈME 8 : Fichiers .part ne s'extraient pas
------------------------------------------------
+### Matériel SCSI
 
-CAUSE: Archive corrompue ou outil incorrect
+**Où acheter du matériel SCSI :**
 
-SOLUTION:
-1. Télécharger directement les images depuis Internet Archive
-2. Essayer HFSExplorer au lieu de unar
-3. Télécharger à nouveau l'archive
+- **eBay** - Rechercher "SCSI DB25 cable Macintosh" ou "SCSI CD-ROM AppleCD"
+- **Forums vintage Mac** - Section petites annonces
+- **Conventions rétro-computing** - VCF, Vintage Computer Festival
 
+**Matériel recommandé :**
 
+- Lecteurs CD-ROM : AppleCD 300/600, Plextor SCSI, Toshiba XM
+- Câbles : DB25 → Centronics 50, blindés, < 3m
+- Terminateurs : Actifs (Acard, Adaptec)
 
-PROBLÈME 9 : "System Error" ou crash pendant l'installation
-------------------------------------------------------------
+---
 
-CAUSE: RAM défectueuse, disquette corrompue, ou conflit matériel
+## 🤝 Contribution
 
-SOLUTION:
-1. Redémarrer et réessayer
-2. Tester la RAM (remplacer si possible)
-3. Recréer toutes les disquettes
-4. Retirer toutes extensions/périphériques externes
+### Comment Contribuer
 
+Les contributions sont les bienvenues ! Voici comment participer :
 
+1. **Fork** le projet
+2. Créez une **branche** pour votre fonctionnalité (`git checkout -b feature/AmazingFeature`)
+3. **Committez** vos changements (`git commit -m 'Add some AmazingFeature'`)
+4. **Poussez** vers la branche (`git push origin feature/AmazingFeature`)
+5. Ouvrez une **Pull Request**
 
-PROBLÈME 10 : Le Mac démarre mais affiche un "X" ou un "?"
------------------------------------------------------------
+### Types de Contributions Appréciées
 
-CAUSE: Système incomplet ou System Folder non "blessed"
+- 🐛 Corrections de bugs
+- 📝 Améliorations de la documentation
+- ✨ Nouvelles fonctionnalités
+- 🌍 Traductions
+- 🧪 Tests et validations
+- 💡 Suggestions d'amélioration
 
-SOLUTION:
-1. Redémarrer depuis Disk Tools
-2. Ouvrir le System Folder sur le disque dur
-3. Double-cliquer sur "System" (le "bénit")
-4. Redémarrer
+### Signaler un Bug
 
+Ouvrez une **issue** sur GitHub avec :
+- Description du problème
+- Système Linux utilisé
+- Méthode choisie (disquettes/CD-ROM)
+- Messages d'erreur exacts
+- Logs du script si disponibles
 
+### Demander une Fonctionnalité
 
-================================================================================
-10. RESSOURCES ET LIENS
-================================================================================
+Ouvrez une **issue** avec le tag `enhancement` :
+- Description de la fonctionnalité souhaitée
+- Cas d'usage
+- Bénéfices attendus
 
-TÉLÉCHARGEMENT D'IMAGES SYSTÈME:
----------------------------------
-- Macintosh Garden (Principal)
-  https://macintoshgarden.org/apps/system-7-floppy-sets
+---
 
-- Internet Archive - System 7.5.3
-  https://archive.org/details/system7.5.3d
+## 📄 Licence
 
-- Macintosh Repository
-  https://www.macintoshrepository.org/598-mac-os-7-floppy-install-sets-system-7-x-
+Ce projet est sous licence **MIT** - voir le fichier [LICENSE](LICENSE) pour plus de détails.
 
-- WinWorld
-  https://winworldpc.com/product/mac-os-7/75
+### En Résumé
 
+Vous êtes libre de :
+- ✅ Utiliser ce projet personnellement ou commercialement
+- ✅ Modifier le code source
+- ✅ Distribuer le projet
+- ✅ Utiliser le projet en privé
 
+Sous conditions :
+- 📋 Inclure la licence et le copyright original
+- 📋 Indiquer les modifications apportées
 
-OUTILS ET UTILITAIRES:
-----------------------
-- HFSExplorer (Lire disques Mac sous Linux/Windows)
-  https://sourceforge.net/projects/catacombae/
+---
 
-- System Enablers (Collection complète)
-  https://macintoshgarden.org/apps/apple-system-enablers
+## 👨‍💻 Auteurs
 
-- SuperBooter75 (Disquette utilitaires universelle)
-  https://vintageapple.org/gamba2/superbooter75.html
+- **ebest** - *Développement initial* - Février 2026
 
-- Disk Copy 6.3.3 (Créer images disquettes)
-  Inclus dans les archives System 7.5.3
+### Remerciements
 
+- **Macintosh Garden** - Archives et préservation
+- **Internet Archive** - Hébergement des images
+- **68kMLA** - Expertise technique et communauté
+- **Communauté vintage Mac** - Tests et retours
 
+---
 
-DOCUMENTATION TECHNIQUE:
-------------------------
-- Everymac - Performa 460 Specs
-  https://everymac.com/systems/apple/mac_performa/specs/mac_performa_460.html
+## 🌟 Versions du Système
 
-- Apple Support - Performa 460
-  https://support.apple.com/en-us/112332
+### System 7.5.3 (Recommandé) ⭐⭐⭐⭐⭐
 
-- 68kMLA - Forum Mac vintage
-  https://68kmla.org
+- **Avantages :** Stable, gratuit, pas de System Enabler requis
+- **Inconvénients :** Aucun
+- **Idéal pour :** Utilisation quotidienne
 
-- Macintosh Garden - Forum
-  https://macintoshgarden.org/forum
+### System 7.5.5 ⭐⭐⭐⭐
 
+- **Avantages :** Plus stable que 7.5.3
+- **Inconvénients :** Nécessite 7.5.3 + update
+- **Idéal pour :** Utilisation intensive
 
+### System 7.6.1 ⭐⭐⭐
 
-GUIDES ET TUTORIELS:
---------------------
-- Guide System 7 - Low End Mac
-  https://lowendmac.com/2013/classic-mac-os-downloads-and-updates/
+- **Avantages :** Dernière version 68k, fonctionnalités avancées
+- **Inconvénients :** Plus gourmand en RAM
+- **Idéal pour :** Mac avec 8 Mo+ de RAM
 
-- System Selection Guide
-  https://www.savagetaylor.com/2015/11/17/setting-up-your-vintage-classic-68k-macintosh-selecting-your-system-software/
+### System 7.1P ⭐⭐⭐
 
-- E-Maculation (Émulation Mac)
-  https://www.emaculation.com
+- **Avantages :** Version d'origine, léger, rapide
+- **Inconvénients :** Nécessite System Enabler 308
+- **Idéal pour :** Puristes, expérience authentique
 
+---
 
+## ⚡ Démarrage Ultra-Rapide
 
-COMMUNAUTÉS ET FORUMS:
-----------------------
-- 68k Macintosh Liberation Army
-  https://68kmla.org/bb/
+### En 3 Commandes (Méthode Disquettes)
 
-- Vintage Computer Forum
-  https://forum.vcfed.org/
+```bash
+git clone https://github.com/votre-repo/performa460-installer.git
+cd performa460-installer
+./performa460-installer.sh
+```
 
-- r/VintageApple (Reddit)
-  https://www.reddit.com/r/VintageApple/
+Suivez le menu interactif → Choix 1 → Suivez les instructions !
 
-- Compact Mac Community
-  https://www.facebook.com/groups/compactmacs
+### En 3 Commandes (Méthode CD-ROM)
 
+```bash
+git clone https://github.com/votre-repo/performa460-installer.git
+cd performa460-installer
+./performa460-installer.sh
+```
 
+Suivez le menu interactif → Choix 2 → Suivez les instructions !
 
-INFORMATIONS SYSTEM ENABLER:
------------------------------
-- System Enabler 308 v1.0 - REQUIS pour System 7.1 sur Performa 460
-- System Enabler 003 v1.1 - Fonctionne aussi (LC III+)
-- PAS de System Enabler requis pour System 7.5+
+---
 
+## 🎉 Succès !
 
+Une fois l'installation terminée, vous devriez voir :
 
-VERSIONS DE SYSTÈME RECOMMANDÉES POUR PERFORMA 460:
----------------------------------------------------
-1. System 7.5.3 ★★★★★ (RECOMMANDÉ)
-   - Stable
-   - Gratuit
-   - Pas de System Enabler requis
-   - Bonnes performances
+```
+┌─────────────────────────────────────────┐
+│                                         │
+│     Bienvenue dans System 7.5.3         │
+│                                         │
+│         [Happy Mac Icon]                │
+│                                         │
+│     Macintosh Performa 460              │
+│     Motorola 68030 - 33 MHz             │
+│     Mémoire : 4096 Ko                   │
+│                                         │
+└─────────────────────────────────────────┘
+```
 
-2. System 7.5.5 ★★★★☆
-   - Plus stable que 7.5.3
-   - Nécessite 7.5.3 installé d'abord + update
+**Félicitations ! Votre Performa 460 est restauré !** 🖥️✨
 
-3. System 7.6.1 ★★★☆☆
-   - Dernière version 68k
-   - Plus gourmand en RAM
-   - Bonnes fonctionnalités
+---
 
-4. System 7.1 ★★★☆☆
-   - Version d'origine
-   - Nécessite System Enabler 308
-   - Léger et rapide
+## 📞 Support
 
+- **Documentation complète :** `docs/guide-complet.md`
+- **Issues GitHub :** https://github.com/votre-repo/performa460-installer/issues
+- **Forum 68kMLA :** https://68kmla.org/bb/
+- **Discord Vintage Apple :** [lien vers serveur]
 
+---
 
-ALTERNATIVES À DD POUR WINDOWS:
--------------------------------
-- WinImage - Écrire images sur disquettes
-- TransMac - Formater et écrire disquettes Mac
-- HFVExplorer - Manipuler fichiers Mac
+## 🗺️ Roadmap
 
+### Version 1.0 (Actuelle)
+- ✅ Installation par disquettes
+- ✅ Installation par CD-ROM
+- ✅ Script interactif
+- ✅ Documentation complète
 
+### Version 1.1 (Prévue)
+- ⏳ Support System 7.1P (Performa original)
+- ⏳ Support System 7.6.1
+- ⏳ Mode silencieux (non-interactif)
+- ⏳ Vérification MD5 des images
 
-COMMANDES LINUX RÉCAPITULATIVES:
----------------------------------
+### Version 2.0 (Future)
+- 💡 Support autres modèles Performa (450, 475, 550)
+- 💡 Support LC III/LC III+
+- 💡 Interface graphique (GTK)
+- 💡 Images pré-configurées personnalisées
 
-# Vérifier module floppy
-lsmod | grep floppy
-sudo modprobe floppy
+---
 
-# Identifier disquette
-lsblk
-dmesg | tail
+## ❓ FAQ
 
-# Formater HFS
-sudo hformat -f -l "NomDisk" /dev/fd0
+### Est-ce que ça fonctionne sur d'autres Macs ?
 
-# Copier image sur disquette
-sudo umount /dev/fd0 2>/dev/null
-sudo dd if=fichier.image of=/dev/fd0 bs=1440k status=progress
-sudo sync
-sudo eject /dev/fd0
+Oui, avec adaptations :
+- **Performa 450, 466, 467** : Identique (même hardware)
+- **LC III/LC III+** : Identique (version éducation)
+- **Performa 475, 476** : Nécessite System Enabler 364
+- **Autres 68k Macs** : Vérifier la compatibilité System Enabler
 
-# Vérifier contenu
-sudo file -s /dev/fd0
-sudo mount -t hfs /dev/fd0 /mnt/floppy
-ls -la /mnt/floppy
-sudo umount /mnt/floppy
+### Puis-je utiliser Windows au lieu de Linux ?
 
-# Extraire archives Mac
-unar fichier.sit
-unar fichier.part
+Oui, avec des outils alternatifs :
+- **WinImage** - Pour écrire images sur disquettes
+- **TransMac** - Pour formater et copier
+- **ImgBurn** - Pour graver CD
 
+Mais le script bash ne fonctionnera pas directement.
 
+### Le CD-ROM sera-t-il bootable ?
 
-TAILLES DE FICHIERS STANDARD:
-------------------------------
-Image disquette 1.44 Mo: 1 474 560 octets
-Image disquette 800K: 819 200 octets
-System 7.5.3 complet: ~86 Mo (archive)
-System 7.5.3 installé: ~15-20 Mo sur disque
+**Non.** Le Performa 460 (68k) **ne peut pas** booter depuis CD-ROM. Cette capacité est apparue avec les Power Macintosh (PowerPC). Vous devez toujours booter avec la disquette "Disk Tools 1", puis installer depuis le CD.
 
+### Combien de temps prend l'installation ?
 
+- **Création des supports :** 30-45 min (disquettes) ou 10 min (CD)
+- **Installation sur Mac :** 45-60 min (disquettes) ou 20-30 min (CD)
+- **Total :** ~1h30 (disquettes) ou ~40 min (CD)
 
-NOTES IMPORTANTES:
-------------------
-1. System 7.5.3 est la version la plus facile à trouver et installer
-2. Toujours utiliser des disquettes de bonne qualité
-3. Les disquettes ont une durée de vie limitée (10-30 ans)
-4. Prévoir quelques disquettes de spare
-5. Ne jamais forcer l'éjection d'une disquette
-6. Nettoyer les têtes de lecture régulièrement
-7. Conserver les disquettes à l'abri de l'humidité et des aimants
+### Où trouver un lecteur CD-ROM SCSI ?
 
+- eBay (chercher "AppleCD SCSI" ou "Plextor SCSI")
+- Forums vintage Mac (occasions)
+- Conventions rétro-computing
+- Prix : 30-100€ selon modèle et état
 
+---
 
-CHECKLIST AVANT INSTALLATION:
-------------------------------
-□ Linux opérationnel avec lecteur disquette
-□ 20 disquettes 2HD vierges/testées
-□ Images System 7.5.3 téléchargées et vérifiées
-□ Toutes les 19 disquettes créées et étiquetées
-□ Performa 460 testé et fonctionnel
-□ Disque dur formaté et vérifié
-□ Sauvegarde des données importantes (si applicable)
+> **"Think Different"** - Apple Inc.
 
-
-
-================================================================================
-FIN DU GUIDE
-================================================================================
-
-Ce guide a été compilé à partir de sources communautaires incluant:
-- Macintosh Garden
-- Internet Archive
-- 68kMLA Forums
-- Vintage Apple resources
-- E-Maculation documentation
-
-Version: 1.0 - Février 2026
-
-Pour toute question ou aide supplémentaire, consultez les forums communautaires
-listés dans la section Ressources.
-
-Bonne restauration de votre Performa 460! 🖥️
-
-================================================================================
+**Bon voyage dans les années 90 ! 🚀**
